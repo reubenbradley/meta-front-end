@@ -1,0 +1,7 @@
+# Top level Git Ignore file
+# Individual subfolders will have their own .gitignore file as needed   
+
+# Popular editors:
+.vscode
+.idea
+.vs
