@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -33,6 +33,9 @@ const socials = [
 ];
 
 const Header = () => {
+  const [lastScrollY, setLastScrollY] = useState(0); // Keep track of the last scroll position
+  const boxRef = useRef(null);
+
   const handleClick = (anchor) => () => {
     const id = `${anchor}-section`;
     const element = document.getElementById(id);
@@ -43,6 +46,46 @@ const Header = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY) {
+        // Scrolling down
+        // console.log('Scrolling down!');
+        boxRef.current.style.transform = "translateY(-200px)";
+        // boxRef.current.style.backgroundColor = "red";
+        setLastScrollY(currentScrollY);
+      }
+      else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        // console.log('Scrolling up!');
+        boxRef.current.style.transform = "translateY(0)";
+        boxRef.current.style.backgroundColor = "#18181b";
+        setLastScrollY(currentScrollY);
+      }
+
+    };
+
+    // This needs to reference the normal JavaScript window object
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+
+    // Ensure the effect runs every time the lastScrollY changes
+  }, [lastScrollY]);
+
+  // Alternative way to create the social media links, not used for this demo
+  const navItems = socials.map(social => {
+    return (
+      <a href={social.url} key={social.url} target="_blank">&nbsp;
+        <FontAwesomeIcon icon={social.icon} size="2x" />
+      </a>
+    );
+  })
 
   return (
     <Box
@@ -55,6 +98,7 @@ const Header = () => {
       transitionDuration=".3s"
       transitionTimingFunction="ease-in-out"
       backgroundColor="#18181b"
+      ref={boxRef}
     >
       <Box color="white" maxWidth="1280px" margin="0 auto">
         <HStack
@@ -62,13 +106,27 @@ const Header = () => {
           py={4}
           justifyContent="space-between"
           alignItems="center"
+          spacing={12}
         >
           <nav>
             {/* Add social media links based on the `socials` data */}
+            <HStack spacing={4}>
+              {socials.map(({ icon, url }) => (
+                  <a
+                      key={url}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer">
+                    <FontAwesomeIcon icon={icon} size="2x" key={url} />
+                  </a>
+              ))}
+            </HStack>
           </nav>
           <nav>
-            <HStack spacing={8}>
+            <HStack spacing={12}>
               {/* Add links to Projects and Contact me section */}
+              <a href="/#projects" onClick={handleClick("projects")}>Projects</a>
+              <a href="/#contactme" onClick={handleClick("contactme")}>Contact Me</a>
             </HStack>
           </nav>
         </HStack>
